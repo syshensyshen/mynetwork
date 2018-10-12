@@ -17,11 +17,11 @@ syshen_activation<Dtype>::syshen_activation(cudnnHandle_t handle_) {
 
 template <typename Dtype>
 syshen_activation<Dtype>::~syshen_activation() {
-	CHECK_CUDNN_ERROR(cudnnDestroyTensorDescriptor(&input_desc));
-	CHECK_CUDNN_ERROR(cudnnDestroyTensorDescriptor(&output_desc));
-	CHECK_CUDNN_ERROR(cudnnDestroyActivationDescriptor(&act_desc));
-	if (set_cudnn_handle_t) {
-		CHECK_CUDNN_ERROR(cudnnDestroy(&handle_t));
+	CHECK_CUDNN_ERROR(cudnnDestroyTensorDescriptor(input_desc));
+	CHECK_CUDNN_ERROR(cudnnDestroyTensorDescriptor(output_desc));
+	CHECK_CUDNN_ERROR(cudnnDestroyActivationDescriptor(act_desc));
+	if (set_cudnn_handle) {
+		CHECK_CUDNN_ERROR(cudnnDestroy(handle_t));
 	}
 }
 

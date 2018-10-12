@@ -39,17 +39,17 @@ syshen_convolution<Dtype>::~syshen_convolution() {
 	CHECK_CUDNN_ERROR(cudnnDestroyTensorDescriptor(input_desc));
 	CHECK_CUDNN_ERROR(cudnnDestroyTensorDescriptor(output_desc));
 	CHECK_CUDNN_ERROR(cudnnDestroyFilterDescriptor(filter_desc));
-	CHECK_CUDNN_ERROR(cudnnDestroyConvolutionDescriptor(&conv_desc));
+	CHECK_CUDNN_ERROR(cudnnDestroyConvolutionDescriptor(conv_desc));
 	if (has_bias) {
 		CHECK_CUDNN_ERROR(cudnnDestroyTensorDescriptor(bias));
 	}
 	if (set_cudnn_handle) {
-		CHECK_CUDNN_ERROR(cudnnDestroy(&handle_t));
+		CHECK_CUDNN_ERROR(cudnnDestroy(handle_t));
 	}
 	
 	if (use_stream) {
 		CHECK_CUDA_ERROR(cudaStreamDestroy(stream));
-		CHECK_CUDA_ERROR(cudaEventDestroy(strat));
+		//CHECK_CUDA_ERROR(cudaEventDestroy(strat));
 	}
 }
 
@@ -66,7 +66,7 @@ void syshen_convolution<Dtype>::SetUp() {
 		in_h, in_w, nStride, cStride, in_w, 1));
 
 	CHECK_CUDNN_ERROR(cudnnSetFilter4dDescriptor(
-		filter_dsec,
+		filter_desc,
 		cudnnDataType_t::CUDNN_DATA_FLOAT,
 		CUDNN_TENSOR_NCHW,
 		out_channels, in_channels, kernel_h, kernel_w));
@@ -86,13 +86,15 @@ void syshen_convolution<Dtype>::SetUp() {
 		out_batch, out_channels, out_h, out_w));
 
 	CHECK_CUDNN_ERROR(cudnnGetConvolutionForwardAlgorithm(
-		handle_t, input_desc, filter_dsec,
+		handle_t, input_desc, filter_desc,
 		conv_desc, output_desc, CUDNN_CONVOLUTION_FWD_PREFER_FASTEST,
 		0, &algo));
-
-	CHECK_CUDNN_ERROR(cudnnGetConvolutionBackwardFilterWorkspaceSize(
-		handle_t, input_desc, filter_dsec,
-		conv_desc, output_desc, algo, &workSpaceSize));
+	CHECK_CUDNN_ERROR(cudnnGetConvolutionForwardWorkspaceSize(handle_t,
+		input_desc,
+		filter_desc,
+		conv_desc,
+		output_desc,
+		algo, &workSpaceSize));
 	if (0 != workSpaceSize)
 		CHECK_CUDA_ERROR(cudaMalloc((void**)&workSpace, workSpaceSize));
 
@@ -106,7 +108,7 @@ void syshen_convolution<Dtype>::Forward(Dtype *input, Dtype *output, Dtype *weig
 	Dtype conv_alpha = 1.0f;
 	Dtype conv_beta = 0;
 	cudnnConvolutionForward(handle_t, &conv_alpha, input_desc, input,
-		filter_dsec, weights, conv_desc, algo, workSpace, workSpaceSize, &conv_beta, output_desc, output);
+		filter_desc, weights, conv_desc, algo, workSpace, workSpaceSize, &conv_beta, output_desc, output);
 	if (has_bias) {
 		cudnnAddTensor(handle_t, &conv_alpha, bias, bias_weights, &conv_alpha, output_desc, output);
 	}

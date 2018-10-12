@@ -30,7 +30,7 @@ public:
 	}
 
 	inline void setOutputParam(int out_batch, int out_channels, int out_h, int out_w) {
-		out_batch = output_batch;
+		out_batch = out_batch;
 		out_channels = out_channels;
 		out_h = out_h;
 		out_w = out_w;
@@ -58,7 +58,9 @@ protected:
 		kernel_w = kernel_w;
 	}
 private:
-	cudnnTensorDescriptor_t input_desc, output_desc, filter_dsec, conv_desc, bias;
+	cudnnTensorDescriptor_t input_desc, output_desc, bias;
+	cudnnFilterDescriptor_t filter_desc;
+	cudnnConvolutionDescriptor_t conv_desc;
 	cudnnConvolutionFwdAlgo_t algo = CUDNN_CONVOLUTION_FWD_ALGO_IMPLICIT_GEMM;
 	cudnnHandle_t handle_t;
 	cudaStream_t stream;
@@ -71,6 +73,7 @@ private:
 	int batch, in_channels, in_h, in_w;
 	int out_batch, out_channels, out_h, out_w;
 };
+template class syshen_convolution<float>;
 
 template <typename Dtype>
 class syshen_pooling {
@@ -108,6 +111,7 @@ private:
 	int batch, channels, height, width;
 	bool set_cudnn_handle;
 };
+template class syshen_pooling<float>;
 
 template <typename Dtype>
 class syshen_activation {
@@ -128,13 +132,14 @@ public:
 	}
 private:
 	cudnnHandle_t handle_t;
-	cudnnActivationDescriptor_t input_desc, output_desc;
+	cudnnTensorDescriptor_t input_desc, output_desc;
 	cudnnActivationDescriptor_t act_desc;
 	cudnnActivationMode_t  mode_;
 	bool set_cudnn_handle;
 
 	int batch, channles, height, width;
 };
+template class syshen_activation<float>;
 
 template <typename Dtype>
 class syshen_batchnorm {
@@ -162,7 +167,7 @@ private:
 	int batch, channles, height, width;
 
 };
-
+template class syshen_batchnorm<float>;
 
 template <typename Dtype>
 class syshen_lrn {
@@ -193,10 +198,11 @@ private:
 	cudnnHandle_t handle_t;
 	cudnnLRNMode_t mode_;
 	unsigned lrnN;
-	double lrnAlpha, lrnBeta, lrn;
+	double lrnAlpha, lrnBeta, lrn, lrnK;
 	bool set_cudnn_handle;
 	int batch, channles, height, width;
 };
+template class syshen_lrn<float>;
 
 template <typename Dtype>
 class syshen_softmax {
@@ -222,6 +228,32 @@ private:
 	bool set_cudnn_handle;
 	int batch, channles, height, width;
 };
+template class syshen_softmax<float>;
+
+//template <typename Dtype>
+//class syshen_deconvolution {
+//
+//public:
+//	syshen_deconvolution(cudnnHandle_t handle_);
+//	~syshen_deconvolution();
+//	void SetUp();
+//	void Forward(Dtype *input, Dtype *output, Dtype *weights, Dtype *bias_weights);
+//
+//	inline void setInputParam(int batch, int channels, int height, int width) {
+//		batch = batch;
+//		channles = channels;
+//		height = height;
+//		width;
+//	}
+//
+//private:
+//	cudnnTensorDescriptor_t input_desc, output_desc;
+//	cudnnSoftmaxAlgorithm_t algo;
+//	cudnnSoftmaxMode_t mode_;
+//	cudnnHandle_t handle_t;
+//	bool set_cudnn_handle;
+//	int batch, channles, height, width;
+//};
 
 #endif
 

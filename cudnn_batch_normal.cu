@@ -40,7 +40,7 @@ template <typename Dtype>
 void syshen_batchnorm<Dtype>::Forward(Dtype *x, Dtype *y, Dtype *global_mean,
 	Dtype *global_var, Dtype *bnScale, Dtype *bnBias) {
 	Dtype alpha = Dtype(1.0);
-	Dtype beta = Dype(0.0);
+	Dtype beta = Dtype(0.0);
 	CHECK_CUDNN_ERROR(cudnnBatchNormalizationForwardInference(handle_t,
 		mode_,
 		&alpha, 

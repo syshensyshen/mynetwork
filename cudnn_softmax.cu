@@ -16,11 +16,11 @@ syshen_softmax<Dtype>::syshen_softmax(cudnnHandle_t handle_) {
 
 template <typename Dtype>
 syshen_softmax<Dtype>::~syshen_softmax() {
-	CHECK_CUDNN_ERROR(cudnnDestroyTensorDescriptor(&input_desc));
-	CHECK_CUDNN_ERROR(cudnnDestroyTensorDescriptor(&output_desc));
+	CHECK_CUDNN_ERROR(cudnnDestroyTensorDescriptor(input_desc));
+	CHECK_CUDNN_ERROR(cudnnDestroyTensorDescriptor(output_desc));
 
-	if (set_cudnn_handle_t) {
-		CHECK_CUDNN_ERROR(cudnnDestroy(&handle_t));
+	if (set_cudnn_handle) {
+		CHECK_CUDNN_ERROR(cudnnDestroy(handle_t));
 	}
 }
 
