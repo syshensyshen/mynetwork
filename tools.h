@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cudnn.h>
+#include <cuda.h>
 
 #define CHECK_CUDA_ERROR(argument_t) {                           \
     cudaError_t error_t = argument_t;                              \

@@ -230,30 +230,59 @@ private:
 };
 template class syshen_softmax<float>;
 
-//template <typename Dtype>
-//class syshen_deconvolution {
-//
-//public:
-//	syshen_deconvolution(cudnnHandle_t handle_);
-//	~syshen_deconvolution();
-//	void SetUp();
-//	void Forward(Dtype *input, Dtype *output, Dtype *weights, Dtype *bias_weights);
-//
-//	inline void setInputParam(int batch, int channels, int height, int width) {
-//		batch = batch;
-//		channles = channels;
-//		height = height;
-//		width;
-//	}
-//
-//private:
-//	cudnnTensorDescriptor_t input_desc, output_desc;
-//	cudnnSoftmaxAlgorithm_t algo;
-//	cudnnSoftmaxMode_t mode_;
-//	cudnnHandle_t handle_t;
-//	bool set_cudnn_handle;
-//	int batch, channles, height, width;
-//};
+template <typename Dtype>
+class syshen_deconvolution {
+
+public:
+	syshen_deconvolution(cudnnHandle_t handle_);
+	~syshen_deconvolution();
+	void SetUp();
+
+	inline void setInputParam(int batch, int channels, int height, int width) {
+		batch = batch;
+		in_channels = channels;
+		in_h = height;
+		in_w = width;
+	}
+
+	inline void setInputKernelParam(int stride_h, int stride_w, int pad_h, int pad_w,
+		int dilation_h, int dilation_w, int kernel_h, int kernel_w) {
+		stride_h = stride_h;
+		stride_w = stride_w;
+		pad_h = pad_h;
+		pad_w = pad_w;
+		dilation_h = dilation_h;
+		dilation_w = dilation_w;
+		kernel_h = kernel_h;
+		kernel_w = kernel_w;
+	}
+
+	inline void setOutputParam(int out_batch, int out_channels, int out_h, int out_w) {
+		out_batch = out_batch;
+		out_channels = out_channels;
+		out_h = out_h;
+		out_w = out_w;
+	}
+
+	void Forward(Dtype *input, Dtype *output, Dtype *weights, Dtype *bias_weights);
+
+private:
+	cudnnTensorDescriptor_t input_desc, output_desc, bias;
+	cudnnFilterDescriptor_t filter_desc;
+	cudnnConvolutionDescriptor_t conv_desc;
+	cudnnConvolutionBwdDataAlgo_t algo;
+	cudnnHandle_t handle_t;
+	cudaStream_t stream;
+	cudaEvent_t start;
+	size_t workSpaceSize;
+	bool use_stream, has_bias, set_cudnn_handle;
+	void* workSpace;
+	int stride_h, stride_w, pad_h, pad_w;
+	int dilation_h, dilation_w, kernel_h, kernel_w;
+	int batch, in_channels, in_h, in_w;
+	int out_batch, out_channels, out_h, out_w;
+};
+template class syshen_deconvolution<float>;
 
 #endif
 
