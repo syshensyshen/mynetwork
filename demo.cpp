@@ -37,8 +37,5 @@ int main(int argc, char **argv) {
 
 	prob.setInputParam(1, 10, 1, 1);
 
-
-
-	system("pause");
 	return 0;
 }

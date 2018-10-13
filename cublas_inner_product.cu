@@ -1,5 +1,5 @@
 #include "cuda_func.hpp"
-#include <cublas.h>
+
 
 template <>
 void gpu_gemm<float>(cublasHandle_t cublas_handle_t, const cublasOperation_t TransA,
@@ -31,7 +31,7 @@ template <typename Dtype>
 syshen_innerproduct<Dtype>::syshen_innerproduct(cublasHandle_t handle_) {
 	set_cublas_handle_ = false;
 	if (!handle_) {
-		cublasCreate(&cublas_handle_t);
+		CHECK_CUBLAS_ERROR(cublasCreate(&cublas_handle_t));
 		set_cublas_handle_ = true;
 	}
 	else {
@@ -43,7 +43,7 @@ syshen_innerproduct<Dtype>::syshen_innerproduct(cublasHandle_t handle_) {
 template <typename Dtype>
 syshen_innerproduct<Dtype>::~syshen_innerproduct() {
 	if (set_cublas_handle_) {
-		cublasDestroy(cublas_handle_t);
+		CHECK_CUBLAS_ERROR(cublasDestroy(cublas_handle_t));
 	}
 	CHECK_CUDA_ERROR(cudaFree(bias_ones));
 }
@@ -51,7 +51,7 @@ syshen_innerproduct<Dtype>::~syshen_innerproduct() {
 template <typename Dtype>
 void syshen_innerproduct<Dtype>::SetUp() {
 	CHECK_CUDA_ERROR(cudaMalloc(&bias_ones, output_channels * sizeof(Dtype)));
-	CHECK_CUDA_ERROR(cudaMemset(bias_ones, Dtype(1.0), output_channels));
+	CHECK_CUDA_ERROR(cudaMemset(bias_ones, 1, output_channels));
 }
 
 template <typename Dtype>
@@ -69,5 +69,4 @@ void syshen_innerproduct<Dtype>::Forward(Dtype *x, Dtype *y, Dtype *weight, Dtyp
 			batch, output_channels, 1, alpha,
 			bias_ones, bias, beta, y);
 	}
-
 }
