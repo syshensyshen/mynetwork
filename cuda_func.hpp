@@ -62,6 +62,10 @@ public:
 		width;
 	}
 
+	inline void setOutputParam(int out_channels) {
+		output_channels = out_channels;
+	}
+
 private:
 	int batch, channels, height, width;
 	int output_channels;
@@ -74,7 +78,7 @@ template class syshen_innerproduct<float>;
 
 
 template <typename Dtype>
-void caffe_gpu_gemm(cublasHandle_t cublas_handle_t, const cublasOperation_t TransA,
+void gpu_gemm(cublasHandle_t cublas_handle_t, const cublasOperation_t TransA,
 	const cublasOperation_t TransB, const int M, const int N, const int K,
 	const Dtype alpha, const Dtype* A, const Dtype* B, const Dtype beta,
 	Dtype* C);

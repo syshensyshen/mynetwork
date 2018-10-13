@@ -45,11 +45,13 @@ syshen_innerproduct<Dtype>::~syshen_innerproduct() {
 	if (set_cublas_handle_) {
 		cublasDestroy(cublas_handle_t);
 	}
+	CHECK_CUDA_ERROR(cudaFree(bias_ones));
 }
 
 template <typename Dtype>
 void syshen_innerproduct<Dtype>::SetUp() {
-
+	CHECK_CUDA_ERROR(cudaMalloc(&bias_ones, output_channels * sizeof(Dtype)));
+	CHECK_CUDA_ERROR(cudaMemset(bias_ones, Dtype(1.0), output_channels));
 }
 
 template <typename Dtype>
